@@ -2,9 +2,8 @@ package com.example.calculator;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.icu.text.SymbolTable;
 import android.os.Bundle;
-import android.os.health.SystemHealthManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,6 +14,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected TextView display;
     protected TextView display2;
+
+    protected String inputString;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_substract.setOnClickListener(this);
         button_dot.setOnClickListener(this);
         button_equals.setOnClickListener(this);
+
+        inputString = "";
     }
 
 
@@ -64,58 +67,82 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.button9:
                 this.updateDisplay2("9");
+                inputString += "9";
                 break;
             case R.id.button8:
                 this.updateDisplay2("8");
+                inputString += "8";
                 break;
             case R.id.button7:
                 this.updateDisplay2("7");
+                inputString += "7";
                 break;
             case R.id.button6:
                 this.updateDisplay2("6");
+                inputString += "6";
                 break;
             case R.id.button5:
                 this.updateDisplay2("5");
+                inputString += "5";
                 break;
             case R.id.button4:
                 this.updateDisplay2("4");
+                inputString += "4";
                 break;
             case R.id.button3:
                 this.updateDisplay2("3");
+                inputString += "3";
                 break;
             case R.id.button2:
                 this.updateDisplay2("2");
+                inputString += "2";
                 break;
             case R.id.button1:
                 this.updateDisplay2("1");
+                inputString += "1";
                 break;
             case R.id.button0:
                 this.updateDisplay2("0");
+                inputString += "0";
                 break;
             case R.id.button_divide:
                 this.updateDisplay2(" / ");
+                inputString += " ";
+                inputString += "/";
+                inputString += " ";
                 break;
             case R.id.button_multiply:
-                this.updateDisplay2(" * ");
+                this.updateDisplay2("*");
+                inputString += " ";
+                inputString += "*";
+                inputString += " ";
                 break;
             case R.id.button_plus:
                 this.updateDisplay2(" + ");
+                inputString += " ";
+                inputString += "+";
+                inputString += " ";
                 break;
             case R.id.button_substract:
                 this.updateDisplay2(" - ");
+                inputString += " ";
+                inputString += "-";
+                inputString += " ";
                 break;
             case R.id.button_ce:
                 this.display.setText("");
                 this.display2.setText("");
+                inputString = "";
                 break;
             case R.id.button_equals:
-                updateDisplay("0");
                 display2.setText("");
+                prepareInput(inputString);
+                inputString = "";
                 break;
         }
     }
 
-    private void updateDisplay(final String value) {
+    private void updateDisplay(String value) {
         this.display.setText(value);
     }
 
@@ -123,6 +150,85 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.display2.append(value);
     }
 
+    private void prepareInput(String input) {
+        if(input.startsWith(" ")) {
+            String firstChar = String.valueOf(input.charAt(1));
+            if(firstChar.contains("/")|| firstChar.contains("*")) {
+                updateDisplay("error");
+                return;
+            } else {
+                if(firstChar.contains("+")) {
+                    input = input.replace(" + ", "");
+                }
+                if(firstChar.contains("-")) {
+                    input = input.replace(" - ", "-");
+                }
+            }
+        }
+        calculate(input);
+    }
+
+    private void calculate(String input) {
+        String[] arr = input.split(" ");
+        if(arr.length > 1) {
+            for(int i=0; i<arr.length; i++) {
+                int temp = 0;
+                try {
+                    if(arr[i].contains("/")) {
+                        int op1 = Integer.parseInt(arr[i-1]);
+                        int op2 = Integer.parseInt(arr[i+1]);
+                        temp = op1 / op2;
+                        arr[i-1] = " ";
+                        arr[i] = String.valueOf(temp);
+                        arr[i+1] = " ";
+                    }
+                    if(arr[i].contains("*")) {
+                        int op1 = Integer.parseInt(arr[i-1]);
+                        int op2 = Integer.parseInt(arr[i+1]);
+                        temp = op1 * op2;
+                        arr[i-1] = " ";
+                        arr[i] = String.valueOf(temp);
+                        arr[i+1] = " ";
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+            for(int i=0; i<arr.length; i++) {
+                int temp = 0;
+                try {
+                    if(arr[i].contains("+")) {
+                        int op1 = Integer.parseInt(arr[i-1]);
+                        int op2 = Integer.parseInt(arr[i+1]);
+                        temp = op1 + op2;
+                        arr[i-1] = " ";
+                        arr[i] = String.valueOf(temp);
+                        arr[i+1] = " ";
+                    }
+                    if(arr[i].contains("-")) {
+                        int op1 = Integer.parseInt(arr[i-1]);
+                        int op2 = Integer.parseInt(arr[i+1]);
+                        temp = op1 - op2;
+                        arr[i-1] = " ";
+                        arr[i] = String.valueOf(temp);
+                        arr[i+1] = " ";
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+            inputString = "";
+            for(String s : arr) {
+                if(s != " ") {
+                    inputString += s;
+                    inputString += " ";
+                }
+            }
+            calculate(inputString);
+        } else {
+            updateDisplay(arr[0]);
+        }
+    }
 
 
 }
