@@ -2,13 +2,10 @@ package com.example.calculator;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.icu.text.SymbolTable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -107,27 +104,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.button_divide:
                 this.updateDisplay2(" / ");
-                inputString += " ";
-                inputString += "/";
-                inputString += " ";
+                inputString += " / ";
                 break;
             case R.id.button_multiply:
-                this.updateDisplay2("*");
-                inputString += " ";
-                inputString += "*";
-                inputString += " ";
+                this.updateDisplay2(" * ");
+                inputString += " * ";
                 break;
             case R.id.button_plus:
                 this.updateDisplay2(" + ");
-                inputString += " ";
-                inputString += "+";
-                inputString += " ";
+                inputString += " + ";
                 break;
             case R.id.button_substract:
                 this.updateDisplay2(" - ");
-                inputString += " ";
-                inputString += "-";
-                inputString += " ";
+                inputString += " - ";
                 break;
             case R.id.button_ce:
                 this.display.setText("");
@@ -154,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(input.startsWith(" ")) {
             String firstChar = String.valueOf(input.charAt(1));
             if(firstChar.contains("/")|| firstChar.contains("*")) {
-                updateDisplay("error");
+                updateDisplay("Error");
                 return;
             } else {
                 if(firstChar.contains("+")) {
@@ -177,6 +166,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if(arr[i].contains("/")) {
                         int op1 = Integer.parseInt(arr[i-1]);
                         int op2 = Integer.parseInt(arr[i+1]);
+                        if(op2 == 0) {
+                            System.out.println("Not allowed");
+                            updateDisplay("Error");
+                            input = "";
+                            return;
+                        }
                         temp = op1 / op2;
                         arr[i-1] = " ";
                         arr[i] = String.valueOf(temp);
